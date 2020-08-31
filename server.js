@@ -67,9 +67,10 @@ app.post("/submit", (req, res) => {
         res.status(200).send(data);
       }
     }
-  );
-  // );
-});
+    );
+    // );
+  });
+  */
 
 app.post("/email", (req, res) => {
   const transporter = nodemailer.createTransport({
@@ -107,12 +108,11 @@ app.post("/email", (req, res) => {
   transporter.sendMail(mailOptions, function (err, res) {
     if (err) {
       console.error("there was an error: ", err);
+      res.status(500).end();
     } else {
       console.log("here is the res: ", res);
+      res.send(req.body);
     }
   });
   // res.send("email sent!");
-  res.send(req.body);
 });
-
-*/
