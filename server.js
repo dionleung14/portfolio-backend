@@ -1,6 +1,8 @@
 // Sets up the express app
 const express = require("express");
 
+const cors = require("cors");
+
 // const mongojs = require("mongojs");
 // const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
@@ -17,6 +19,20 @@ const PORT = process.env.PORT || 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// developing
+// app.use(
+//   cors({
+//     options: ["http://localhost:3000/"],
+//   })
+// );
+
+// deployed site
+app.use(
+  cors({
+    options: ["http://localhost:3000/"],
+  })
+);
+
 // Static directory
 // app.use(express.static("public"));
 
@@ -27,7 +43,9 @@ app.use(express.json());
 // app.use("/", allRoutes);
 
 app.get("/", (req, res) => {
-  res.send("this is my database WOOHOO");
+  res.send(
+    "This backend does not serve data, only handles nodemailer requests"
+  );
 });
 
 app.listen(PORT, () => {
@@ -105,14 +123,14 @@ app.post("/email", (req, res) => {
     `,
     // replyTo: `${req.body.emailAddress}`,
   };
-  transporter.sendMail(mailOptions, function (err, res) {
+  transporter.sendMail(mailOptions, (err, data) => {
     if (err) {
       console.error("there was an error: ", err);
       res.status(500).end();
     } else {
-      console.log("here is the res: ", res);
-      res.send(req.body);
+      console.log("here is the data: ", data);
+      // res.status(200).send(req.body);
+      res.status(200).send("completed");
     }
   });
-  // res.send("email sent!");
 });
