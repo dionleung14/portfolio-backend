@@ -44,7 +44,7 @@ app.use(
 
 app.get("/", (req, res) => {
   res.send(
-    "This backend does not serve data, only handles nodemailer requests"
+    `This backend does not serve data, only handles nodemailer requests. My favorite pokemon is ${process.env.POKEMON}`
   );
 });
 
