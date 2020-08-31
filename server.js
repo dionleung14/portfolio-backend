@@ -29,7 +29,7 @@ app.use(express.json());
 // deployed site
 app.use(
   cors({
-    options: ["http://localhost:3000/"],
+    options: ["https://dion-leung-portfolio.herokuapp.com/"],
   })
 );
 
