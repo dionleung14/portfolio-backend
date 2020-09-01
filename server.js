@@ -51,44 +51,6 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
 });
-/*
-
-app.get("/all", (req, res) => {
-  db.contacts.find({}, (err, data) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(data);
-    }
-  });
-});
-
-app.post("/submit", (req, res) => {
-  db.contacts.insert(
-    {
-      // hello: req.body.test,
-      call: req.body.call,
-      email: req.body.email,
-      emailAddress: req.body.emailAddress,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      message: req.body.message,
-      phNum: req.body.phNum,
-      subject: req.body.subject,
-      text: req.body.text,
-      date: Date.now(),
-    },
-    (err, data) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.status(200).send(data);
-      }
-    }
-    );
-    // );
-  });
-  */
 
 app.post("/email", (req, res) => {
   const transporter = nodemailer.createTransport({
@@ -104,8 +66,8 @@ app.post("/email", (req, res) => {
   });
   const mailOptions = {
     from: `${req.body.emailAddress}`,
-    to: "kungfumastah.dion@gmail.com",
-    subject: `Message from portfolio: ${req.body.subject}`,
+    to: "dioncleung@gmail.com",
+    subject: `PORTFOLIO CONTACT: ${req.body.subject}`,
     text: `Here is a message from your portfolio!
     From: ${req.body.firstName} ${
       req.body.lastName ? req.body.lastName : "Doe"
