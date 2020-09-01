@@ -65,14 +65,16 @@ app.post("/email", (req, res) => {
     },
   });
   const mailOptions = {
-    from: `${req.body.emailAddress}`,
+    from: `${req.body.firstName}, sending from ${req.body.emailAddress}`,
     to: "dioncleung@gmail.com",
     subject: `PORTFOLIO CONTACT: ${req.body.subject}`,
     text: `Here is a message from your portfolio!
     From: ${req.body.firstName} ${
       req.body.lastName ? req.body.lastName : "Doe"
     } \n
-    Email: ${req.body.emailAddress} \n
+    Email: ${
+      req.body.emailAddress ? req.body.emailAddress : "no email address given"
+    } \n
     Subject: ${req.body.subject} \n
     Message: ${req.body.message} \n
     Phone number: ${
