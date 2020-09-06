@@ -95,7 +95,7 @@ app.post("/email", (req, res) => {
     } else {
       console.log("here is the data: ", data);
       // res.status(200).send(req.body);
-      res.status(500).send("completed");
+      res.status(200).send("completed");
     }
   });
 });
