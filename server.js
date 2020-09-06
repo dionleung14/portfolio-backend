@@ -52,7 +52,7 @@ app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
 });
 
-app.post("/emailhahaha", (req, res) => {
+app.post("/email", (req, res) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -95,7 +95,7 @@ app.post("/emailhahaha", (req, res) => {
     } else {
       console.log("here is the data: ", data);
       // res.status(200).send(req.body);
-      res.status(200).send("completed");
+      res.status(500).send("completed");
     }
   });
 });
