@@ -28,8 +28,11 @@ app.use(express.json());
 
 // deployed site
 app.use(
+  // cors({
+  //   options: ["https://dion-leung-portfolio.herokuapp.com/"],
+  // })
   cors({
-    options: ["https://dion-leung-portfolio.herokuapp.com/"],
+    options: ["http://www.dionleung.engineer/"],
   })
 );
 
