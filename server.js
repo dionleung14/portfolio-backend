@@ -70,7 +70,6 @@ app.post("/email", (req, res) => {
   const mailOptions = {
     from: req.body.emailAddress,
     to: "dioncleung@gmail.com",
-    // cc: req.body.emailAddress,
     subject: `PORTFOLIO CONTACT: ${req.body.subject} from ${req.body.firstName}`,
     text: `Here is a message from your portfolio!
     From: ${req.body.firstName} ${
