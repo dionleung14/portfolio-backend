@@ -32,8 +32,11 @@ app.use(
   //   options: ["https://dion-leung-portfolio.herokuapp.com/"],
   // })
   cors({
-    options: ["http://www.dionleung.engineer/"],
+    options: ["https://www.dionleung.engineer/"],
   })
+  // cors({
+  //   options: [],
+  // })
 );
 
 // Static directory
@@ -52,23 +55,35 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`App is listening on port ${PORT}`);
+  console.log(`App is listening to smooth sounds on port ${PORT}`);
 });
+
+// app.post("/email", (req, res) => {
+//   console.log(req.body);
+//   res.status(200).send("completed");
+// });
 
 app.post("/email", (req, res) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.mail.yahoo.com",
+    service: "yahoo",
+    port: 465,
+    secure: false,
     auth: {
+      // type: "OAuth2",
       // user: "no-reply@gmail.com",
       // Need to create a dummy email account to use here
       // find out how to protect them in process.env?
       user: process.env.EMAIL,
       // pass: "testpassword",
-      pass: process.env.PASSWORD,
+      pass: "inttoytgxfhoyuqq",
+      // pass: process.env.PASSWORD,
     },
+    debug: false,
+    logger: true,
   });
   const mailOptions = {
-    from: req.body.emailAddress,
+    from: process.env.EMAIL,
     to: "dioncleung@gmail.com",
     subject: `PORTFOLIO CONTACT: ${req.body.subject} from ${req.body.firstName}`,
     text: `Here is a message from your portfolio!
@@ -90,9 +105,16 @@ app.post("/email", (req, res) => {
     `,
     // replyTo: `${req.body.emailAddress}`,
   };
+  console.log("mailOptions are here: ");
+  console.log("---------------------------------------------------");
+  // console.log(mailOptions);
   transporter.sendMail(mailOptions, (err, data) => {
     if (err) {
-      console.error("there was an error: ", err);
+      console.error(
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      );
+      console.error("there was an error: ");
+      console.error(err);
       res.status(500).end();
     } else {
       console.log("here is the data: ", data);
