@@ -20,24 +20,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // developing
-// app.use(
-//   cors({
-//     options: ["http://localhost:3000/"],
-//   })
-// );
+app.use(
+  cors({
+    options: ["http://localhost:3000/"],
+  })
+);
 
 // deployed site
-app.use(
-  // cors({
-  //   options: ["https://dion-leung-portfolio.herokuapp.com/"],
-  // })
-  cors({
-    options: ["https://www.dionleung.engineer/"],
-  })
-  // cors({
-  //   options: [],
-  // })
-);
+// app.use(
+// cors({
+//   options: ["https://dion-leung-portfolio.herokuapp.com/"],
+// })
+// cors({
+//   options: ["https://www.dionleung.engineer/"],
+// })
+// cors({
+//   options: [],
+// })
+// );
 
 // Static directory
 // app.use(express.static("public"));
