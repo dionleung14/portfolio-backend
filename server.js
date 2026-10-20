@@ -54,9 +54,26 @@ app.get("/", (req, res) => {
   );
 });
 
-app.listen(PORT, () => {
-  console.log(`App is listening to smooth sounds on port ${PORT}`);
-});
+// `company` must be present and empty. A non-empty `subjectLine` is the
+// previous form trap and is dropped the same way.
+function classifyHoneypot(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return "missing";
+  }
+  if (!Object.prototype.hasOwnProperty.call(body, "company")) {
+    return "missing";
+  }
+  if (body.company !== "") {
+    return "tripped";
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "subjectLine")) {
+    const legacy = body.subjectLine;
+    if (legacy !== "") {
+      return "tripped";
+    }
+  }
+  return "ok";
+}
 
 // app.post("/email", (req, res) => {
 //   console.log(req.body);
@@ -64,6 +81,16 @@ app.listen(PORT, () => {
 // });
 
 app.post("/email", (req, res) => {
+  const honeypot = classifyHoneypot(req.body);
+  if (honeypot === "missing") {
+    console.log("email submission blocked: missing-honeypot");
+    return res.status(400).send("rejected");
+  }
+  if (honeypot === "tripped") {
+    console.log("email submission blocked: honeypot-filled");
+    return res.status(200).send("completed");
+  }
+
   const transporter = nodemailer.createTransport({
     host: "smtp.mail.yahoo.com",
     service: "yahoo",
@@ -123,3 +150,11 @@ app.post("/email", (req, res) => {
     }
   });
 });
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`App is listening to smooth sounds on port ${PORT}`);
+  });
+}
+
+module.exports = { app, classifyHoneypot };
