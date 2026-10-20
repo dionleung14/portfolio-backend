@@ -1,0 +1,199 @@
+{
+  "schema": "honeypot-bypass-handoff/v2",
+  "reviewed_at": "2026-10-20",
+  "updated_at": "2026-10-20",
+  "audience": "frontend-agent",
+  "human_review": "Cursor canvas honeypot-bypass-review.canvas.tsx in the mail-handler project canvases directory",
+  "verdict": "POST /email now sends mail only when company is present and an empty string, and when subjectLine is absent or empty. The live contact form still omits company, so deploying this handler before the form change makes real submissions return HTTP 400 and sends no mail.",
+  "logs": "This backend repo contains no production mail logs. Recent incidents cannot be attributed to a single bypass path from code alone.",
+  "deploy_order": "Ship the frontend change in portfolio-nodemailer before or in the same release as this handler. The form observed on 2026-10-20 does not send company. After this handler is deployed, that payload is rejected.",
+  "repos": {
+    "backend": {
+      "path": "c:\\Users\\kung_\\code\\misc\\portfolio\\dcl-portfolio-mail-handler",
+      "github": "https://github.com/dionleung14/portfolio-backend",
+      "entry": "server.js",
+      "endpoint": "POST /email",
+      "classifier": "classifyHoneypot",
+      "deploy_url_observed_in_frontend": "https://dcl-portfolio-mail-handler.herokuapp.com/email"
+    },
+    "frontend": {
+      "path": "c:\\Users\\kung_\\code\\misc\\portfolio\\portfolio-nodemailer",
+      "github": "git@github.com:dionleung14/portfolio-nodemailer.git",
+      "form": "src/components/ContactForm.js",
+      "client": "src/utils/API.js",
+      "honeypot_commit": "1365ffd added a bot checker on the input form (2020-11-26)",
+      "head_observed": "e9a2492 Merge pull request #62 from dionleung14/ui-update",
+      "status": "Unchanged. Still uses a hidden subjectLine input and omits it from the axios body."
+    }
+  },
+  "do_not": [
+    "Copy the SMTP password from server.js into any file, ticket, or commit.",
+    "Edit the mail handler from the frontend task unless the user explicitly expands scope.",
+    "Rename or remove the visible subject select. Its name is subject.",
+    "Show a success message when the trap DOM value is non-empty. The handler answers HTTP 200 completed for a filled trap and does not send mail, so axios will look successful.",
+    "Keep sending a payload that omits company. That payload now receives HTTP 400 rejected."
+  ],
+  "server_contract": {
+    "implemented": true,
+    "required_field": "company",
+    "required_value": "exactly \"\". Whitespace is a filled trap.",
+    "legacy_field": "subjectLine",
+    "legacy_rule": "Absent or empty string is allowed. Any non-empty value is treated as a filled trap.",
+    "responses": [
+      {
+        "when": "company is missing, or the body is not a JSON object",
+        "status": 400,
+        "body": "rejected",
+        "mail_sent": false,
+        "log": "email submission blocked: missing-honeypot"
+      },
+      {
+        "when": "company is present and is not an empty string, or subjectLine is present and is not an empty string",
+        "status": 200,
+        "body": "completed",
+        "mail_sent": false,
+        "log": "email submission blocked: honeypot-filled"
+      },
+      {
+        "when": "company is \"\" and subjectLine is absent or \"\"",
+        "status": 200,
+        "body": "completed",
+        "mail_sent": true,
+        "note": "SMTP errors still return HTTP 500 with an empty body."
+      }
+    ],
+    "preserved_payload_keys": [
+      "firstName",
+      "lastName",
+      "emailAddress",
+      "phNum",
+      "subject",
+      "message",
+      "call",
+      "email",
+      "text"
+    ],
+    "still_open_on_backend": [
+      "A client that sends company as an empty string still reaches sendMail, including the 2026-10-19 spam shape in observed_spam. The honeypot does not score names, dotted Gmail addresses, the default subject Networking, random message text, or all three contact methods being true. It does not rate-limit or require a submission token.",
+      "CORS is still called with the key options, which cors@2.8.5 ignores.",
+      "The Yahoo SMTP password is still a string literal in server.js. Rotate it separately. Do not copy it."
+    ]
+  },
+  "frontend_honeypot_today": {
+    "state": "subjectLine.subjectLine, useState default empty string",
+    "handler": "handleSubjectLine writes event.target.value. It also calls preventDefault.",
+    "gate": "handleNodeMailerSubmit reloads the page when subjectLine.subjectLine is truthy. Otherwise it POSTs.",
+    "markup": {
+      "element": "input",
+      "type": "hidden",
+      "name": "subjectLine",
+      "style": "display: none",
+      "controlled": true,
+      "lines": "210-220"
+    },
+    "payload_keys": [
+      "firstName",
+      "lastName",
+      "emailAddress",
+      "phNum",
+      "subject",
+      "message",
+      "call",
+      "email",
+      "text"
+    ],
+    "company_in_payload": false,
+    "subjectLine_in_payload": false,
+    "real_subject_control": "select name=subject with fixed options, default Networking"
+  },
+  "frontend_tasks": [
+    {
+      "id": "confirm-production-source",
+      "action": "Confirm the deployed site at www.dionleung.engineer is built from portfolio-nodemailer ContactForm.js before editing. Line numbers match the working tree observed on 2026-10-20."
+    },
+    {
+      "id": "replace-trap-markup",
+      "file": "src/components/ContactForm.js",
+      "lines": "210-220",
+      "action": "Replace the subjectLine hidden input with one text input named company. Keep it in the DOM as type=text. Position the wrapper off-screen (for example position absolute and left -10000px). Set tabIndex to -1, autoComplete to off, and aria-hidden on the wrapper. Do not use type=hidden or display:none. Leave the subject select untouched."
+    },
+    {
+      "id": "read-dom-on-submit",
+      "file": "src/components/ContactForm.js",
+      "lines": "55-92",
+      "action": "Read company from the input DOM value at submit time with a ref or an uncontrolled input. A script can set the DOM value without firing React onChange, and React state would stay empty. Use that same DOM string for both the abort decision and the JSON field."
+    },
+    {
+      "id": "include-company-in-json",
+      "file": "src/components/ContactForm.js",
+      "lines": "82-92",
+      "action": "Add company to contactFormFilled. Humans and untouched forms must send company as \"\". Remove subjectLine from the payload. If the old input remains for any reason, include its DOM value too: a non-empty subjectLine is dropped by the handler with HTTP 200 and no mail."
+    },
+    {
+      "id": "client-abort",
+      "file": "src/components/ContactForm.js",
+      "lines": "55-60",
+      "action": "Skip API.submitEmail when the company DOM value is non-empty. window.location.reload() can stay as a secondary behavior. This abort is required because a filled trap receives HTTP 200 completed, which the current .then() treats as success."
+    },
+    {
+      "id": "empty-company-still-mails",
+      "action": "After this form change, a bot that posts company as an empty string and never fills the text input still reaches sendMail. That is the remaining hole. A later backend change would add a rate limit or a server-checked token. Do not invent that token in the form until the handler verifies it."
+    }
+  ],
+  "payload_examples": {
+    "human_after_frontend_fix": {
+      "company": "",
+      "firstName": "Ada",
+      "lastName": "Lovelace",
+      "emailAddress": "ada@example.com",
+      "phNum": "",
+      "subject": "Networking",
+      "message": "Hello",
+      "call": false,
+      "email": true,
+      "text": false,
+      "result": "Handler sends mail and returns HTTP 200 completed."
+    },
+    "current_live_form": {
+      "firstName": "Ada",
+      "subject": "Networking",
+      "message": "Hello",
+      "email": true,
+      "result": "HTTP 400 rejected. No mail. The form's 12 second failure timer runs because axios rejects the status and there is no .catch()."
+    },
+    "filled_trap": {
+      "company": "Acme SEO",
+      "message": "Buy links",
+      "result": "HTTP 200 completed. No mail."
+    }
+  },
+  "observed_spam": {
+    "received_at": "Mon Oct 19 2026 07:21:53 GMT+0000",
+    "note": "The mailed text is the handler template. company and subjectLine are not printed, so this is the request implied by the fields that are printed. Subject Networking is the form's default select value.",
+    "implied_request_blocked_by_this_handler": {
+      "firstName": "Lffvox",
+      "lastName": "Mlmevnxlu",
+      "emailAddress": "cu.mi.f.op.o.f.eti.96@gmail.com",
+      "subject": "Networking",
+      "message": "KRZXLNnDofrIodxPcda",
+      "phNum": "5437453498",
+      "email": true,
+      "call": true,
+      "text": true,
+      "result": "HTTP 400 rejected. No mail, because company is absent."
+    },
+    "same_message_if_frontend_sends_empty_company": {
+      "company": "",
+      "firstName": "Lffvox",
+      "lastName": "Mlmevnxlu",
+      "emailAddress": "cu.mi.f.op.o.f.eti.96@gmail.com",
+      "subject": "Networking",
+      "message": "KRZXLNnDofrIodxPcda",
+      "phNum": "5437453498",
+      "email": true,
+      "call": true,
+      "text": true,
+      "result": "HTTP 200 completed and mail is sent. Do not treat the handler as a content filter for this pattern."
+    }
+  }
+}
