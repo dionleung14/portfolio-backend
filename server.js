@@ -33,7 +33,7 @@ app.use(
   // })
   cors({
     options: ["https://www.dionleung.engineer/"],
-  })
+  }),
   // cors({
   //   options: [],
   // })
@@ -50,7 +50,7 @@ app.use(
 
 app.get("/", (req, res) => {
   res.send(
-    `This backend does not serve data, only handles nodemailer requests. My favorite pokemon right now is: ${process.env.POKEMON}`
+    `This backend does not serve any data, only handles nodemailer requests. My favorite pokemon right now is: ${process.env.POKEMON}`,
   );
 });
 
@@ -111,7 +111,7 @@ app.post("/email", (req, res) => {
   transporter.sendMail(mailOptions, (err, data) => {
     if (err) {
       console.error(
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       );
       console.error("there was an error: ");
       console.error(err);
